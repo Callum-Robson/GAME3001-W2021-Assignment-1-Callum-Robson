@@ -47,31 +47,21 @@ void PlayScene::handleEvents()
 	{
 		TheGame::Instance()->quit();
 	}
-
-	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_1))
-	{
-		TheGame::Instance()->changeSceneState(START_SCENE);
-	}
-
-	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_2))
-	{
-		TheGame::Instance()->changeSceneState(END_SCENE);
-	}
 }
 
 void PlayScene::start()
 {
 	// Set GUI Title
-	m_guiTitle = "Play Scene";
-
-	m_pTarget = new Target();
-	m_pTarget->getTransform()->position = glm::vec2(700.0f, 300.0f);
-	addChild(m_pTarget);
+	m_guiTitle = "Play Scene";	
 
 	m_pObstacle = new Obstacle();
 	m_pObstacle->getTransform()->position = glm::vec2(500.0f, 300.0f);
 	m_pObstacle->getTransform()->scale = glm::vec2(50.0f, 50.0f);
 	addChild(m_pObstacle);
+
+	m_pTarget = new Target();
+	m_pTarget->getTransform()->position = glm::vec2(700.0f, 300.0f);
+	addChild(m_pTarget);
 
 	// instantiating spaceship
 	m_pSpaceShip = new SpaceShip();
@@ -79,6 +69,10 @@ void PlayScene::start()
 	m_pSpaceShip->setEnabled(false);
 	m_pSpaceShip->setDestination(m_pTarget->getTransform()->position);
 	addChild(m_pSpaceShip);
+
+	m_pInstructionsLabel = new Label("Press 1 for Seeking, 2 for Arrival, 3 for Fleeing", "Consolas", 20, { 200, 0, 200, 255 }, glm::vec2(400.0f, 100.0f));
+	m_pInstructionsLabel->setParent(this);
+	addChild(m_pInstructionsLabel);
 }
 
 void PlayScene::GUI_Function() const

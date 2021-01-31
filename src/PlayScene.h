@@ -32,6 +32,8 @@ private:
 	SpaceShip* m_pSpaceShip;
 	Target* m_pTarget;
 	Obstacle* m_pObstacle;
+
+	Label* m_pInstructionsLabel{};
 	
 	// UI Items
 	

@@ -1,5 +1,5 @@
 #include "SpaceShip.h"
-
+#include "EventManager.h"
 
 #include "Game.h"
 #include "Util.h"
@@ -37,6 +37,18 @@ void SpaceShip::draw()
 
 void SpaceShip::update()
 {
+	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_1))
+	{
+		m_behaviorChoice = 1;
+	}
+	else if (EventManager::Instance().isKeyDown(SDL_SCANCODE_2))
+	{
+		m_behaviorChoice = 2;
+	}
+	else if (EventManager::Instance().isKeyDown(SDL_SCANCODE_3))
+	{
+		m_behaviorChoice = 3;
+	}
 	m_Move();
 }
 
@@ -105,37 +117,51 @@ float SpaceShip::getRotation() const
 
 void SpaceShip::m_Move()
 {
-	auto deltaTime = TheGame::Instance()->getDeltaTime();
+		auto deltaTime = TheGame::Instance()->getDeltaTime();
 
-	// direction with magnitude
-	m_targetDirection = m_destination - getTransform()->position;
-	
-	// normalized direction
-	m_targetDirection = Util::normalize(m_targetDirection);
+		// direction with magnitude
+		m_targetDirection = m_destination - getTransform()->position;
 
-	auto target_rotation = Util::signedAngle(getOrientation(), m_targetDirection);
+		// normalized direction
+		m_targetDirection = Util::normalize(m_targetDirection);
 
-	auto turn_sensitivity = 5.0f;
+		auto target_rotation = Util::signedAngle(getOrientation(), m_targetDirection);
 
-	if(abs(target_rotation) > turn_sensitivity)
-	{
-		if (target_rotation > 0.0f)
+		auto turn_sensitivity = 5.0f;
+
+		if (abs(target_rotation) > turn_sensitivity)
 		{
-			setRotation(getRotation() + getTurnRate());
+			if (target_rotation > 0.0f)
+			{
+				setRotation(getRotation() + getTurnRate());
+			}
+			else if (target_rotation < 0.0f)
+			{
+				setRotation(getRotation() - getTurnRate());
+			}
 		}
-		else if (target_rotation < 0.0f)
+
+		getRigidBody()->acceleration = getOrientation() * getAccelerationRate();
+
+		if (m_behaviorChoice == 1)
 		{
-			setRotation(getRotation() - getTurnRate());
+			// using the formula pf = pi + vi*t + 0.5ai*t^2
+			getRigidBody()->velocity += getOrientation() * (deltaTime)+
+				0.5f * getRigidBody()->acceleration * (deltaTime);
+
+			getRigidBody()->velocity = Util::clamp(getRigidBody()->velocity, m_maxSpeed);
+
+			getTransform()->position += getRigidBody()->velocity;
 		}
-	}
-	
-	getRigidBody()->acceleration = getOrientation() * getAccelerationRate();
 
-	// using the formula pf = pi + vi*t + 0.5ai*t^2
-	getRigidBody()->velocity += getOrientation() * (deltaTime)+
-		0.5f * getRigidBody()->acceleration * (deltaTime);
+		if (m_behaviorChoice == 2)
+		{
+			// moves away from target but but faces opposite of where is going
+			getRigidBody()->velocity += getOrientation() * (deltaTime)+
+				0.5f * getRigidBody()->acceleration * (deltaTime);
 
-	getRigidBody()->velocity = Util::clamp(getRigidBody()->velocity, m_maxSpeed);
+			getRigidBody()->velocity = Util::clamp(getRigidBody()->velocity, m_maxSpeed);
 
-	getTransform()->position += getRigidBody()->velocity;
+			getTransform()->position -= getRigidBody()->velocity;
+		}
 }

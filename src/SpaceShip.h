@@ -39,6 +39,7 @@ private:
 	float m_maxSpeed;
 	float m_turnRate;
 	float m_accelerationRate;
+	int m_behaviorChoice;
 
 	// private function
 	void m_Move();
