@@ -125,6 +125,12 @@ void SpaceShip::m_Move()
 		// normalized direction
 		m_targetDirection = Util::normalize(m_targetDirection);
 
+		if (m_behaviorChoice == 2)
+		{
+			m_targetDirection *= -1;
+		}
+
+	
 		auto target_rotation = Util::signedAngle(getOrientation(), m_targetDirection);
 
 		auto turn_sensitivity = 5.0f;
@@ -143,7 +149,7 @@ void SpaceShip::m_Move()
 
 		getRigidBody()->acceleration = getOrientation() * getAccelerationRate();
 
-		if (m_behaviorChoice == 1)
+		if (m_behaviorChoice == 1 || m_behaviorChoice == 2)
 		{
 			// using the formula pf = pi + vi*t + 0.5ai*t^2
 			getRigidBody()->velocity += getOrientation() * (deltaTime)+
@@ -154,14 +160,4 @@ void SpaceShip::m_Move()
 			getTransform()->position += getRigidBody()->velocity;
 		}
 
-		if (m_behaviorChoice == 2)
-		{
-			// moves away from target but but faces opposite of where is going
-			getRigidBody()->velocity += getOrientation() * (deltaTime)+
-				0.5f * getRigidBody()->acceleration * (deltaTime);
-
-			getRigidBody()->velocity = Util::clamp(getRigidBody()->velocity, m_maxSpeed);
-
-			getTransform()->position -= getRigidBody()->velocity;
-		}
 }
